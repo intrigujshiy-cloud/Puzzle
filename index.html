@@ -104,7 +104,11 @@
         #gameBoard { 
             display: grid; width: 100%; margin: 0 auto; 
             border: 2px solid #1a1a2e; border-radius: 4px; overflow: hidden; 
-            background-size: cover; background-position: center; background-repeat: no-repeat; 
+            
+            /* ИЗМЕНЕНИЕ 1: Теперь картинка строго натягивается на сетку 100% 100% */
+            background-size: 100% 100%; 
+            
+            background-position: center; background-repeat: no-repeat; 
             box-shadow: 0 10px 25px rgba(0,0,0,0.1), 0 0 15px rgba(0, 255, 255, 0.1); 
             aspect-ratio: 4 / 3; background-color: #f4f7f6;
         }
@@ -162,9 +166,9 @@
 </head>
 <body>
 
-    <h1>Генератор: Скрытая картинка</h1>
+    <h1 id="mainEditorTitle">Генератор: Скрытая картинка</h1>
 
-    <div class="layout-container">
+    <div class="layout-container" id="mainLayoutContainer">
         
         <div class="left-panel">
             <div class="editor-section">
@@ -245,7 +249,7 @@
             </div>
         </div> 
 
-        <div class="right-panel">
+        <div class="right-panel" id="rightPanelContainer">
             <div id="gameContainer">
                 <h2 id="gameTitle">Предпросмотр игры</h2>
                 <div id="gameBoard">
@@ -373,7 +377,7 @@
             return JSON.parse(decodeURIComponent(escape(window.atob(encoded))));
         }
 
-        // --- ГЕНЕРАЦИЯ ССЫЛКИ И АВТОКОПИРОВАНИЕ ДЛЯ GENIALLY ---
+        // --- ГЕНЕРАЦИЯ ССЫЛКИ И АВТОКОПИРОВАНИЯ ---
         function generateAndCopyGame() {
             const imgUrl = document.getElementById('imageUrlInput').value.trim();
             const items = document.querySelectorAll('#questionsList .question-item');
@@ -399,27 +403,41 @@
             codeBox.value = iframeHTML;
             document.getElementById('exportContainer').style.display = 'block';
 
-            // Магия автоматического копирования
             codeBox.select();
             document.execCommand('copy');
-            
-            // Если нужно, чтобы страница слегка прокрутилась вниз к инструкции
             document.getElementById('exportContainer').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
-        // --- ИНИЦИАЛИЗАЦИЯ (ПРОВЕРКА РЕЖИМА) ---
+        // --- ИНИЦИАЛИЗАЦИЯ (ПРОВЕРКА РЕЖИМА УЧЕНИКА В GENIALLY) ---
         window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             
             if (urlParams.has('play')) {
+                // ИЗМЕНЕНИЕ 2: Прячем лишнее и растягиваем игру на весь экран без скролла
                 document.querySelector('.left-panel').style.display = 'none';
-                document.querySelector('h1').style.display = 'none';
+                document.getElementById('mainEditorTitle').style.display = 'none';
+                document.getElementById('gameTitle').style.display = 'none';
                 
-                const rightPanel = document.querySelector('.right-panel');
+                const rightPanel = document.getElementById('rightPanelContainer');
                 rightPanel.style.position = 'static';
                 rightPanel.style.border = 'none';
                 rightPanel.style.boxShadow = 'none';
-                document.getElementById('gameTitle').innerText = 'Открой картинку!';
+                rightPanel.style.padding = '0';
+                
+                // Убираем отступы браузера
+                document.body.style.padding = '0';
+                document.body.style.margin = '0';
+                document.body.style.height = '100vh';
+                
+                const gameContainer = document.getElementById('gameContainer');
+                gameContainer.style.height = '100vh';
+                gameContainer.style.display = 'flex';
+                gameContainer.style.flexDirection = 'column';
+                
+                const board = document.getElementById('gameBoard');
+                board.style.height = '100vh';
+                board.style.border = 'none';
+                board.style.borderRadius = '0';
                 
                 try {
                     const config = decodeData(urlParams.get('play'));
@@ -474,27 +492,43 @@
 
             const bonusSlots = (cols * rows) - totalTiles;
 
-            config.d.forEach((item, index) => {
+            // ИЗМЕНЕНИЕ 3: Перемешивание вопросов и подарков (алгоритм тасования)
+            let allTilesData = [];
+            
+            // Собираем вопросы
+            config.d.forEach(item => {
+                allTilesData.push({ type: 'question', data: item });
+            });
+            
+            // Добавляем подарки
+            for (let i = 0; i < bonusSlots; i++) {
+                allTilesData.push({ type: 'bonus' });
+            }
+
+            // Тасуем массив в случайном порядке
+            allTilesData.sort(() => Math.random() - 0.5);
+
+            let questionNumber = 1; // Счетчик номеров вопросов
+
+            // Рисуем перемешанные плитки
+            allTilesData.forEach((tileData) => {
                 const tile = document.createElement('div');
                 tile.className = 'game-tile';
-                tile.innerText = index + 1; 
-                tile.onclick = () => openModal(tile, item.q, item.a);
+
+                if (tileData.type === 'question') {
+                    tile.innerText = questionNumber++; // Номер вопроса по порядку
+                    tile.onclick = () => openModal(tile, tileData.data.q, tileData.data.a);
+                } else {
+                    tile.innerText = '🎁'; 
+                    tile.style.background = 'rgba(255, 140, 0, 0.95)'; 
+                    tile.style.borderRightColor = '#39ff14'; 
+                    tile.style.borderBottomColor = '#1a1a2e'; 
+                    tile.style.textShadow = '0 0 10px rgba(255,255,255,0.8)';
+                    tile.onclick = () => tile.classList.add('tile-solved');
+                }
+                
                 board.appendChild(tile);
             });
-
-            for (let i = 0; i < bonusSlots; i++) {
-                const bonusTile = document.createElement('div');
-                bonusTile.className = 'game-tile';
-                bonusTile.innerText = '🎁'; 
-                
-                bonusTile.style.background = 'rgba(255, 140, 0, 0.95)'; 
-                bonusTile.style.borderRightColor = '#39ff14'; 
-                bonusTile.style.borderBottomColor = '#1a1a2e'; 
-                bonusTile.style.textShadow = '0 0 10px rgba(255,255,255,0.8)';
-                
-                bonusTile.onclick = () => bonusTile.classList.add('tile-solved');
-                board.appendChild(bonusTile);
-            }
         }
 
         function openModal(tileElement, rawQuestion, answerString) {
