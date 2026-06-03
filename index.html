@@ -206,20 +206,36 @@
                 <div class="toolbar" id="mathToolbar">
                     <div class="toolbar-row">
                         <strong>Базовые:</strong>
-                        <button onclick="insertFormula('\\sqrt{}', 6)">√</button>
-                        <button onclick="insertFormula('\\frac{}{}', 6)">½</button>
-                        <button onclick="insertFormula('^{}', 2)">x²</button>
-                        <button onclick="insertFormula('_{}', 2)">x₂</button>
+                        <button onclick="insertFormula('\\sqrt{}', 6)">√ (Корень)</button>
+                        <button onclick="insertFormula('\\frac{}{}', 6)">½ (Дробь)</button>
+                        <button onclick="insertFormula('^{}', 2)">x² (Верхний индекс)</button>
+                        <button onclick="insertFormula('_{}', 2)">x₂ (Нижний индекс)</button>
                         <button onclick="insertSymbol('\\pm')">±</button>
                         <button onclick="insertSymbol('\\neq')">≠</button>
                         <button onclick="insertSymbol('\\approx')">≈</button>
                     </div>
                     <div class="toolbar-row">
-                        <strong>Алгебра:</strong>
+                        <strong>Алгебра/Тригоном.:</strong>
                         <button onclick="insertFormula('\\sin()', 5)">sin</button>
                         <button onclick="insertFormula('\\cos()', 5)">cos</button>
                         <button onclick="insertFormula('\\tan()', 5)">tan</button>
+                        <button onclick="insertFormula('\\log_{}()', 6)">log</button>
                         <button onclick="insertSymbol('\\pi')">π</button>
+                    </div>
+                    <div class="toolbar-row">
+                        <strong>Физика/Высш. мат.:</strong>
+                        <button onclick="insertFormula('\\int_{}^{}', 5)">∫ (Интеграл)</button>
+                        <button onclick="insertFormula('\\sum_{}^{}', 5)">∑ (Сумма)</button>
+                        <button onclick="insertFormula('\\vec{}', 5)">a⃗ (Вектор)</button>
+                        <button onclick="insertSymbol('\\Delta')">Δ</button>
+                        <button onclick="insertSymbol('\\infty')">∞</button>
+                        <button onclick="insertSymbol('^{\\circ}')">° (Градус)</button>
+                    </div>
+                    <div class="toolbar-row">
+                        <strong>Химия:</strong>
+                        <button onclick="insertSymbol('\\rightarrow')">→ (Реакция)</button>
+                        <button onclick="insertFormula('^{}_{}', 2)">Изотоп (C¹⁴₆)</button>
+                        <button onclick="insertFormula('\\rightleftharpoons', 16)">⇌ (Равновесие)</button>
                     </div>
                 </div>
 
@@ -254,7 +270,8 @@
                             <li>Откройте ваш проект в Genially.</li>
                             <li>Нажмите <b>Insert</b> (Вставка) на левой панели.</li>
                             <li>Выберите вкладку <b>Others</b> (Другое).</li>
-                            </ol>
+                            <li>Вставьте скопированный код в поле <b>Code</b> и нажмите Insert.</li>
+                        </ol>
                     </div>
                     <textarea id="iframeCode" readonly onclick="this.select()"></textarea>
                 </div>
@@ -526,7 +543,6 @@
                     tile.onclick = () => openModal(tile, tileData.data.q, tileData.data.a);
                 } else {
                     tile.innerText = '🎁'; 
-                    // Подарочная клетка теперь в стиле Фиолетового неона
                     tile.style.background = 'rgba(176, 38, 255, 0.4)'; 
                     tile.style.color = '#ffffff';
                     tile.style.borderRightColor = '#b026ff'; 
