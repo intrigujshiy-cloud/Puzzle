@@ -14,16 +14,27 @@
 
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
+        :root {
+            /* Строгая палитра: Киберпанк / Синтвейв */
+            --bg-color: #ffffff;
+            --dark-panel: #1a1a2e;
+            --darker-panel: #16213e;
+            --neon-cyan: #00ffff;
+            --neon-purple: #b026ff;
+            --text-main: #333333;
+            --text-light: #ffffff;
+        }
+
         body { 
             font-family: Arial, sans-serif; 
             padding: 20px; 
             max-width: 1500px; 
             margin: 0 auto;
-            background-color: #ffffff; 
-            color: #333;
+            background-color: var(--bg-color); 
+            color: var(--text-main);
         }
         
-        h1 { text-align: center; color: #1a1a2e; width: 100%; margin-bottom: 30px; letter-spacing: 1px;}
+        h1 { text-align: center; color: var(--dark-panel); width: 100%; margin-bottom: 30px; letter-spacing: 1px;}
 
         /* --- СЕТКА: ДВЕ КОЛОНКИ --- */
         .layout-container { display: flex; gap: 30px; align-items: flex-start; }
@@ -31,7 +42,7 @@
         .right-panel {
             flex: 1; min-width: 500px; position: sticky; top: 20px;
             background: #fff; padding: 25px; border-radius: 8px;
-            border: 2px solid #e0e0e0; border-top: 4px solid #00ffff;
+            border: 2px solid #e0e0e0; border-top: 4px solid var(--neon-purple);
             box-shadow: 0 10px 30px rgba(0,0,0,0.05);
         }
 
@@ -40,130 +51,130 @@
             background-color: #fff; border: 1px solid #ddd; border-radius: 8px;
             padding: 20px; margin-bottom: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        .editor-section h3 { margin-top: 0; color: #1a1a2e; border-bottom: 2px solid #00ffff; padding-bottom: 10px; }
+        .editor-section h3 { margin-top: 0; color: var(--dark-panel); border-bottom: 2px solid var(--neon-cyan); padding-bottom: 10px; }
 
         .flex-row { display: flex; gap: 10px; width: 100%; }
         #imageUrlInput { flex: 1; font-size: 16px; padding: 10px; border: 2px solid #bbb; border-radius: 4px; box-sizing: border-box; transition: 0.3s;}
-        #imageUrlInput:focus { border-color: #00ffff; outline: none; box-shadow: 0 0 5px rgba(0,255,255,0.5); }
+        #imageUrlInput:focus { border-color: var(--neon-cyan); outline: none; box-shadow: 0 0 5px rgba(0,255,255,0.5); }
         
-        .btn-primary { background-color: #1a1a2e; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 4px; cursor: pointer; white-space: nowrap; transition: 0.3s;}
-        .btn-primary:hover { background-color: #00ffff; color: #1a1a2e; }
+        .btn-primary { background-color: var(--dark-panel); color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 4px; cursor: pointer; white-space: nowrap; transition: 0.3s;}
+        .btn-primary:hover { background-color: var(--neon-cyan); color: var(--dark-panel); }
         #imagePreviewArea { margin-top: 15px; text-align: center; display: none; }
         #imagePreviewArea img { max-width: 100%; max-height: 250px; border-radius: 4px; border: 1px solid #ddd; }
 
-        .toggle-container { margin-bottom: 15px; font-size: 16px; padding: 10px; background-color: #f8f9fa; border-left: 4px solid #ff8c00; border-radius: 4px; }
+        .toggle-container { margin-bottom: 15px; font-size: 16px; padding: 10px; background-color: #f8f9fa; border-left: 4px solid var(--neon-purple); border-radius: 4px; }
         .toggle-container label { cursor: pointer; user-select: none; }
         .toolbar { display: none; flex-direction: column; gap: 10px; background-color: #f8f9fa; padding: 15px; border-radius: 4px; border: 1px solid #ddd; margin-bottom: 15px; }
         .toolbar-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
         .toolbar-row strong { min-width: 140px; font-size: 14px; color: #444; }
         .toolbar button { padding: 6px 12px; cursor: pointer; font-size: 15px; background-color: #fff; border: 1px solid #ccc; border-radius: 4px; transition: 0.2s; }
-        .toolbar button:hover { background-color: #e0f7fa; border-color: #00ffff; }
+        .toolbar button:hover { background-color: #f0f8ff; border-color: var(--neon-cyan); }
         
         .input-group { margin-bottom: 20px; }
-        .input-group label { display: block; margin-bottom: 5px; font-size: 16px; font-weight: bold; color: #1a1a2e;}
+        .input-group label { display: block; margin-bottom: 5px; font-size: 16px; font-weight: bold; color: var(--dark-panel);}
         textarea { width: 100%; font-size: 16px; padding: 10px; border: 2px solid #bbb; border-radius: 4px; box-sizing: border-box; height: 120px; transition: 0.3s; }
-        textarea:focus { border-color: #00ffff; outline: none; box-shadow: 0 0 5px rgba(0,255,255,0.5); }
-        .preview-box { margin-top: 10px; padding: 15px; border: 1px dashed #ffe600; border-radius: 4px; min-height: 60px; background-color: #fafafa; font-size: 18px; }
+        textarea:focus { border-color: var(--neon-cyan); outline: none; box-shadow: 0 0 5px rgba(0,255,255,0.5); }
+        .preview-box { margin-top: 10px; padding: 15px; border: 1px dashed var(--neon-purple); border-radius: 4px; min-height: 60px; background-color: #fafafa; font-size: 18px; }
         
-        .hint-text { color: #555; font-size: 14px; margin-top: 8px; background-color: #fff3cd; padding: 8px; border-left: 4px solid #ffc107; border-radius: 3px; display: none; }
-        .hint-warning { background-color: #fff3cd; border-left-color: #ffc107; color: #856404; display: block; font-size: 16px;}
-        .hint-success { background-color: #e0f7fa; border-left-color: #00ffff; color: #006064; display: block; font-size: 16px;}
+        .hint-text { color: #555; font-size: 14px; margin-top: 8px; background-color: #f3e8ff; padding: 8px; border-left: 4px solid var(--neon-purple); border-radius: 3px; display: none; }
+        .hint-warning { background-color: #f3e8ff; border-left-color: var(--neon-purple); color: #4a0080; display: block; font-size: 16px;}
+        .hint-success { background-color: #e0f7fa; border-left-color: var(--neon-cyan); color: #006064; display: block; font-size: 16px;}
 
-        .btn-success { background-color: #1a1a2e; color: #00ffff; border: 2px solid #1a1a2e; padding: 12px 20px; font-size: 18px; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 10px; font-weight: bold; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px;}
-        .btn-success:hover { background-color: #00ffff; color: #1a1a2e; }
+        .btn-success { background-color: var(--dark-panel); color: var(--neon-cyan); border: 2px solid var(--dark-panel); padding: 12px 20px; font-size: 18px; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 10px; font-weight: bold; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px;}
+        .btn-success:hover { background-color: var(--neon-cyan); color: var(--dark-panel); }
 
         .questions-list { list-style: none; padding: 0; margin: 0; margin-bottom: 15px;}
-        .question-item { background: #fff; border: 1px solid #ddd; border-left: 4px solid #1a1a2e; padding: 12px 15px; margin-bottom: 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02);}
+        .question-item { background: #fff; border: 1px solid #ddd; border-left: 4px solid var(--dark-panel); padding: 12px 15px; margin-bottom: 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02);}
         .question-item-text { flex-grow: 1; margin-right: 15px; font-size: 16px;}
         .question-answer-badge { background-color: #f0f0f0; color: #333; padding: 4px 8px; border-radius: 4px; font-size: 14px; margin-left: 10px; border: 1px solid #ccc;}
         
-        .delete-btn { background-color: #fff; color: #ff4500; border: 1px solid #ff4500; padding: 6px 12px; border-radius: 4px; cursor: pointer; transition: 0.2s;}
-        .delete-btn:hover { background-color: #ff4500; color: #fff; }
+        .delete-btn { background-color: #fff; color: var(--neon-purple); border: 1px solid var(--neon-purple); padding: 6px 12px; border-radius: 4px; cursor: pointer; transition: 0.2s;}
+        .delete-btn:hover { background-color: var(--neon-purple); color: #fff; }
         .empty-list-msg { color: #888; font-style: italic; text-align: center; padding: 10px; }
 
-        .btn-start-game { background-color: #39ff14; color: #1a1a2e; border: none; padding: 15px 30px; font-size: 18px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 20px; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px;}
-        .btn-start-game:hover { background-color: #32cc11; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(57,255,20,0.3); }
+        .btn-start-game { background-color: var(--neon-purple); color: var(--text-light); border: none; padding: 15px 30px; font-size: 18px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 20px; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px;}
+        .btn-start-game:hover { background-color: #9000ea; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(176,38,255,0.4); }
 
         /* --- БЛОК ЭКСПОРТА --- */
-        #exportContainer { display: none; margin-top: 20px; background: #fafafa; padding: 20px; border-radius: 4px; border: 1px solid #39ff14; border-left: 5px solid #39ff14; text-align: left; }
+        #exportContainer { display: none; margin-top: 20px; background: #fafafa; padding: 20px; border-radius: 4px; border: 1px solid var(--neon-cyan); border-left: 5px solid var(--neon-cyan); text-align: left; }
         #iframeCode { width: 100%; height: 60px; font-family: monospace; font-size: 14px; margin: 15px 0 0 0; border: 1px solid #ddd; padding: 10px; border-radius: 4px; resize: vertical; background-color: #fff;}
         .instructions { font-size: 16px; line-height: 1.5; color: #333; }
-        .instructions b { color: #1a1a2e; }
+        .instructions b { color: var(--dark-panel); }
 
         /* ========================================== */
-        /* --- СТИЛИ ИГРЫ (КИБЕРПАНК - НЕЙТРАЛЬНЫЙ) --- */
+        /* --- СТИЛИ ИГРЫ (КИБЕРПАНК - СТРОГИЙ 2 ЦВЕТА) --- */
         /* ========================================== */
         
         #gameContainer { text-align: center; width: 100%; }
         #gameTitle { 
-            color: #1a1a2e; margin-top: 0; font-family: 'Courier New', Courier, monospace; 
+            color: var(--dark-panel); margin-top: 0; font-family: 'Courier New', Courier, monospace; 
             text-transform: uppercase; letter-spacing: 2px; font-weight: bold; 
-            border-bottom: 2px solid #39ff14; display: inline-block; padding-bottom: 5px;
+            border-bottom: 2px solid var(--neon-purple); display: inline-block; padding-bottom: 5px;
         }
         
         #gameBoard { 
             display: grid; width: 100%; margin: 0 auto; 
-            border: 2px solid #1a1a2e; border-radius: 4px; overflow: hidden; 
+            border: 2px solid var(--dark-panel); border-radius: 4px; overflow: hidden; 
             background-size: 100% 100%; 
             background-position: center; background-repeat: no-repeat; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1), 0 0 15px rgba(0, 255, 255, 0.1); 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1), 0 0 20px rgba(176, 38, 255, 0.15); 
             aspect-ratio: 4 / 3; 
-            background-color: #000; /* Глухая черная подложка */
+            background-color: #000; 
             position: relative;
         }
         
         .game-tile { 
-            /* Значение rgba с 1 (100% непрозрачность), чтобы картинка не светилась сквозь плитки */
             background: rgba(26, 26, 46, 1); 
-            border: 1px solid #16213e; 
-            border-right: 2px solid #ffe600; 
-            border-bottom: 2px solid #00ffff; 
+            border: 1px solid var(--darker-panel); 
+            border-right: 2px solid var(--neon-cyan); 
+            border-bottom: 2px solid var(--neon-purple); 
             display: flex; justify-content: center; align-items: center; 
-            font-size: 36px; font-weight: bold; color: #00ffff; 
-            text-shadow: 0 0 5px rgba(0, 255, 255, 0.4); 
+            font-size: 36px; font-weight: bold; color: var(--neon-cyan); 
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.5); 
             font-family: 'Courier New', Courier, monospace;
             cursor: pointer; transition: all 0.3s ease; 
             user-select: none; 
-            z-index: 2; /* Плитки лежат выше фона */
+            z-index: 2; 
         }
         
         .game-tile:hover { 
             background: rgba(15, 52, 96, 1); 
-            color: #ffffff;
-            border-right-color: #00ffff;
-            border-bottom-color: #ffe600;
-            box-shadow: inset 0 0 15px rgba(0, 255, 255, 0.2);
+            color: var(--text-light);
+            border-right-color: var(--neon-purple);
+            border-bottom-color: var(--neon-cyan);
+            box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.3);
+            text-shadow: 0 0 8px rgba(176, 38, 255, 0.6);
         }
         
         .tile-solved { opacity: 0; pointer-events: none; z-index: 1; }
 
         .empty-board-msg { 
             display: flex; align-items: center; justify-content: center; height: 100%; 
-            color: #1a1a2e; font-size: 18px; font-weight: bold; font-family: monospace;
+            color: var(--dark-panel); font-size: 18px; font-weight: bold; font-family: 'Courier New', Courier, monospace;
             background: rgba(255, 255, 255, 0.85); padding: 20px; text-align: center;
             z-index: 2;
         }
 
-        /* --- ВСПЛЫВАЮЩЕЕ ОКНО (КИБЕРПАНК) --- */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(3px); }
+        /* --- ВСПЛЫВАЮЩЕЕ ОКНО (ТЕПЕРЬ ДОРОГОЕ И ТЕМНОЕ) --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); }
         .modal-content { 
-            background: #ffffff; padding: 30px; border-radius: 4px; max-width: 500px; width: 90%; 
-            text-align: center; box-shadow: 0 0 20px rgba(0, 255, 255, 0.2); 
-            border: 1px solid #1a1a2e; border-top: 4px solid #ffe600; 
+            background: var(--dark-panel); padding: 35px; border-radius: 6px; max-width: 500px; width: 90%; 
+            text-align: center; box-shadow: 0 0 30px rgba(176, 38, 255, 0.3); 
+            border: 1px solid var(--neon-cyan); border-top: 4px solid var(--neon-purple); 
         }
-        .modal-question-text { font-size: 24px; margin-bottom: 25px; color: #1a1a2e; font-family: 'Courier New', monospace; font-weight: bold;}
+        .modal-question-text { font-size: 24px; margin-bottom: 25px; color: var(--text-light); font-family: 'Courier New', Courier, monospace; font-weight: bold; text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);}
         .modal-input { 
-            width: 80%; padding: 12px; font-size: 20px; border: 2px solid #1a1a2e; border-radius: 4px; 
-            margin-bottom: 25px; text-align: center; font-family: monospace; 
-            background: #f8f9fa; color: #ff8c00; font-weight: bold; transition: 0.3s;
+            width: 80%; padding: 12px; font-size: 20px; border: 2px solid var(--neon-purple); border-radius: 4px; 
+            margin-bottom: 25px; text-align: center; font-family: 'Courier New', Courier, monospace; 
+            background: var(--darker-panel); color: var(--neon-cyan); font-weight: bold; transition: 0.3s;
         }
-        .modal-input:focus { outline: none; border-color: #00ffff; box-shadow: 0 0 8px rgba(0, 255, 255, 0.3); }
+        .modal-input:focus { outline: none; border-color: var(--neon-cyan); box-shadow: 0 0 12px rgba(0, 255, 255, 0.4); }
         
-        .modal-btn { background-color: #1a1a2e; color: #00ffff; border: 1px solid #1a1a2e; padding: 12px 25px; font-size: 18px; border-radius: 4px; cursor: pointer; font-weight: bold; text-transform: uppercase; transition: 0.2s; letter-spacing: 1px;}
-        .modal-btn:hover { background-color: #00ffff; color: #1a1a2e; }
+        .modal-btn { background-color: var(--neon-purple); color: var(--text-light); border: 1px solid var(--neon-purple); padding: 12px 25px; font-size: 18px; border-radius: 4px; cursor: pointer; font-weight: bold; text-transform: uppercase; transition: 0.2s; letter-spacing: 1px;}
+        .modal-btn:hover { background-color: var(--neon-cyan); color: var(--dark-panel); border-color: var(--neon-cyan); box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);}
         
-        .modal-close-btn { background-color: transparent; color: #ff4500; border: 1px solid #ff4500; padding: 12px 25px; font-size: 18px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-left: 10px; text-transform: uppercase; transition: 0.2s; letter-spacing: 1px;}
-        .modal-close-btn:hover { background-color: #ff4500; color: #fff; }
+        .modal-close-btn { background-color: transparent; color: var(--neon-cyan); border: 1px solid var(--neon-cyan); padding: 12px 25px; font-size: 18px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-left: 10px; text-transform: uppercase; transition: 0.2s; letter-spacing: 1px;}
+        .modal-close-btn:hover { background-color: var(--neon-cyan); color: var(--dark-panel); box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);}
     </style>
 </head>
 <body>
@@ -236,15 +247,14 @@
                 <button class="btn-start-game" onclick="generateAndCopyGame()">🔗 Сгенерировать и скопировать код для Genially</button>
 
                 <div id="exportContainer">
-                    <h3 style="margin-top: 0; color: #32cc11; text-shadow: 0 0 5px rgba(57,255,20,0.3);">✅ КОД СКОПИРОВАН В БУФЕР ОБМЕНА!</h3>
+                    <h3 style="margin-top: 0; color: var(--neon-cyan); text-shadow: 0 0 5px rgba(0,255,255,0.3);">✅ КОД СКОПИРОВАН В БУФЕР ОБМЕНА!</h3>
                     <div class="instructions">
                         <p><strong>Инструкция по вставке:</strong></p>
                         <ol style="margin-top: 5px; padding-left: 20px;">
                             <li>Откройте ваш проект в Genially.</li>
                             <li>Нажмите <b>Insert</b> (Вставка) на левой панели.</li>
                             <li>Выберите вкладку <b>Others</b> (Другое).</li>
-                            <li>Вставьте скопированный код в поле <b>Code</b> и нажмите Insert.</li>
-                        </ol>
+                            </ol>
                     </div>
                     <textarea id="iframeCode" readonly onclick="this.select()"></textarea>
                 </div>
@@ -265,9 +275,9 @@
     <div id="questionModal" class="modal-overlay">
         <div class="modal-content">
             <div id="modalQuestionText" class="modal-question-text">Текст вопроса</div>
-            <input type="text" id="modalAnswerInput" class="modal-input" placeholder="Введите код доступа..." autocomplete="off">
+            <input type="text" id="modalAnswerInput" class="modal-input" placeholder="Ваш ответ..." autocomplete="off">
             <br>
-            <button class="modal-btn" onclick="checkAnswer()">Взлом</button>
+            <button class="modal-btn" onclick="checkAnswer()">Ответить</button>
             <button class="modal-close-btn" onclick="closeModal()">Отмена</button>
         </div>
     </div>
@@ -516,10 +526,12 @@
                     tile.onclick = () => openModal(tile, tileData.data.q, tileData.data.a);
                 } else {
                     tile.innerText = '🎁'; 
-                    tile.style.background = 'rgba(255, 140, 0, 1)'; // Плотный оранжевый
-                    tile.style.borderRightColor = '#39ff14'; 
-                    tile.style.borderBottomColor = '#1a1a2e'; 
-                    tile.style.textShadow = '0 0 10px rgba(255,255,255,0.8)';
+                    // Подарочная клетка теперь в стиле Фиолетового неона
+                    tile.style.background = 'rgba(176, 38, 255, 0.4)'; 
+                    tile.style.color = '#ffffff';
+                    tile.style.borderRightColor = '#b026ff'; 
+                    tile.style.borderBottomColor = '#00ffff'; 
+                    tile.style.textShadow = '0 0 10px rgba(0,255,255,0.8)';
                     tile.onclick = () => tile.classList.add('tile-solved');
                 }
                 
