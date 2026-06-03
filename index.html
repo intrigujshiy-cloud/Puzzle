@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Генератор игры: Скрытая картинка</title>
+    
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            }
+        };
+    </script>
+
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            max-width: 1500px; 
+            margin: 0 auto;
+            background-color: #ffffff; 
+            color: #333;
+        }
+        
+        h1 { text-align: center; color: #1a1a2e; width: 100%; margin-bottom: 30px; letter-spacing: 1px;}
+
+        /* --- СЕТКА: ДВЕ КОЛОНКИ --- */
+        .layout-container { display: flex; gap: 30px; align-items: flex-start; }
+        .left-panel { flex: 1; min-width: 500px; max-width: 700px; }
+        .right-panel {
+            flex: 1; min-width: 500px; position: sticky; top: 20px;
+            background: #fff; padding: 25px; border-radius: 8px;
+            border: 2px solid #e0e0e0; border-top: 4px solid #00ffff;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        /* --- СТИЛИ РЕДАКТОРА (ЛЕВАЯ ЧАСТЬ) --- */
+        .editor-section {
+            background-color: #fff; border: 1px solid #ddd; border-radius: 8px;
+            padding: 20px; margin-bottom: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .editor-section h3 { margin-top: 0; color: #1a1a2e; border-bottom: 2px solid #00ffff; padding-bottom: 10px; }
+
+        .flex-row { display: flex; gap: 10px; width: 100%; }
+        #imageUrlInput { flex: 1; font-size: 16px; padding: 10px; border: 2px solid #bbb; border-radius: 4px; box-sizing: border-box; transition: 0.3s;}
+        #imageUrlInput:focus { border-color: #00ffff; outline: none; box-shadow: 0 0 5px rgba(0,255,255,0.5); }
+        
+        .btn-primary { background-color: #1a1a2e; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 4px; cursor: pointer; white-space: nowrap; transition: 0.3s;}
+        .btn-primary:hover { background-color: #00ffff; color: #1a1a2e; }
+        #imagePreviewArea { margin-top: 15px; text-align: center; display: none; }
+        #imagePreviewArea img { max-width: 100%; max-height: 250px; border-radius: 4px; border: 1px solid #ddd; }
+
+        .toggle-container { margin-bottom: 15px; font-size: 16px; padding: 10px; background-color: #f8f9fa; border-left: 4px solid #ff8c00; border-radius: 4px; }
+        .toggle-container label { cursor: pointer; user-select: none; }
+        .toolbar { display: none; flex-direction: column; gap: 10px; background-color: #f8f9fa; padding: 15px; border-radius: 4px; border: 1px solid #ddd; margin-bottom: 15px; }
+        .toolbar-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+        .toolbar-row strong { min-width: 140px; font-size: 14px; color: #444; }
+        .toolbar button { padding: 6px 12px; cursor: pointer; font-size: 15px; background-color: #fff; border: 1px solid #ccc; border-radius: 4px; transition: 0.2s; }
+        .toolbar button:hover { background-color: #e0f7fa; border-color: #00ffff; }
+        
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 5px; font-size: 16px; font-weight: bold; color: #1a1a2e;}
+        textarea { width: 100%; font-size: 16px; padding: 10px; border: 2px solid #bbb; border-radius: 4px; box-sizing: border-box; height: 120px; transition: 0.3s; }
+        textarea:focus { border-color: #00ffff; outline: none; box-shadow: 0 0 5px rgba(0,255,255,0.5); }
+        .preview-box { margin-top: 10px; padding: 15px; border: 1px dashed #ffe600; border-radius: 4px; min-height: 60px; background-color: #fafafa; font-size: 18px; }
+        
+        .hint-text { color: #555; font-size: 14px; margin-top: 8px; background-color: #fff3cd; padding: 8px; border-left: 4px solid #ffc107; border-radius: 3px; display: none; }
+        .hint-warning { background-color: #fff3cd; border-left-color: #ffc107; color: #856404; display: block; font-size: 16px;}
+        .hint-success { background-color: #e0f7fa; border-left-color: #00ffff; color: #006064; display: block; font-size: 16px;}
+
+        .btn-success { background-color: #1a1a2e; color: #00ffff; border: 2px solid #1a1a2e; padding: 12px 20px; font-size: 18px; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 10px; font-weight: bold; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px;}
+        .btn-success:hover { background-color: #00ffff; color: #1a1a2e; }
+
+        .questions-list { list-style: none; padding: 0; margin: 0; margin-bottom: 15px;}
+        .question-item { background: #fff; border: 1px solid #ddd; border-left: 4px solid #1a1a2e; padding: 12px 15px; margin-bottom: 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02);}
+        .question-item-text { flex-grow: 1; margin-right: 15px; font-size: 16px;}
+        .question-answer-badge { background-color: #f0f0f0; color: #333; padding: 4px 8px; border-radius: 4px; font-size: 14px; margin-left: 10px; border: 1px solid #ccc;}
+        
+        .delete-btn { background-color: #fff; color: #ff4500; border: 1px solid #ff4500; padding: 6px 12px; border-radius: 4px; cursor: pointer; transition: 0.2s;}
+        .delete-btn:hover { background-color: #ff4500; color: #fff; }
+        .empty-list-msg { color: #888; font-style: italic; text-align: center; padding: 10px; }
+
+        .btn-start-game { background-color: #39ff14; color: #1a1a2e; border: none; padding: 15px 30px; font-size: 18px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 20px; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px;}
+        .btn-start-game:hover { background-color: #32cc11; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(57,255,20,0.3); }
+
+        /* --- БЛОК ЭКСПОРТА --- */
+        #exportContainer { display: none; margin-top: 20px; background: #fafafa; padding: 20px; border-radius: 4px; border: 1px solid #39ff14; border-left: 5px solid #39ff14; text-align: left; }
+        #iframeCode { width: 100%; height: 60px; font-family: monospace; font-size: 14px; margin: 15px 0 0 0; border: 1px solid #ddd; padding: 10px; border-radius: 4px; resize: vertical; background-color: #fff;}
+        .instructions { font-size: 16px; line-height: 1.5; color: #333; }
+        .instructions b { color: #1a1a2e; }
+
+        /* ========================================== */
+        /* --- СТИЛИ ИГРЫ (КИБЕРПАНК - НЕЙТРАЛЬНЫЙ) --- */
+        /* ========================================== */
+        
+        #gameContainer { text-align: center; width: 100%; }
+        #gameTitle { 
+            color: #1a1a2e; margin-top: 0; font-family: 'Courier New', Courier, monospace; 
+            text-transform: uppercase; letter-spacing: 2px; font-weight: bold; 
+            border-bottom: 2px solid #39ff14; display: inline-block; padding-bottom: 5px;
+        }
+        
+        #gameBoard { 
+            display: grid; width: 100%; margin: 0 auto; 
+            border: 2px solid #1a1a2e; border-radius: 4px; overflow: hidden; 
+            background-size: cover; background-position: center; background-repeat: no-repeat; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1), 0 0 15px rgba(0, 255, 255, 0.1); 
+            aspect-ratio: 4 / 3; background-color: #f4f7f6;
+        }
+        
+        .game-tile { 
+            background: rgba(26, 26, 46, 0.95); 
+            border: 1px solid #16213e; 
+            border-right: 2px solid #ffe600; 
+            border-bottom: 2px solid #00ffff; 
+            display: flex; justify-content: center; align-items: center; 
+            font-size: 36px; font-weight: bold; color: #00ffff; 
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.4); 
+            font-family: 'Courier New', Courier, monospace;
+            cursor: pointer; transition: all 0.3s ease; 
+            user-select: none; 
+        }
+        
+        .game-tile:hover { 
+            background: rgba(15, 52, 96, 0.95); 
+            color: #ffffff;
+            border-right-color: #00ffff;
+            border-bottom-color: #ffe600;
+            box-shadow: inset 0 0 15px rgba(0, 255, 255, 0.2);
+        }
+        
+        .tile-solved { opacity: 0; pointer-events: none; }
+
+        .empty-board-msg { 
+            display: flex; align-items: center; justify-content: center; height: 100%; 
+            color: #1a1a2e; font-size: 18px; font-weight: bold; font-family: monospace;
+            background: rgba(255, 255, 255, 0.85); padding: 20px; text-align: center;
+        }
+
+        /* --- ВСПЛЫВАЮЩЕЕ ОКНО (КИБЕРПАНК) --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(3px); }
+        .modal-content { 
+            background: #ffffff; padding: 30px; border-radius: 4px; max-width: 500px; width: 90%; 
+            text-align: center; box-shadow: 0 0 20px rgba(0, 255, 255, 0.2); 
+            border: 1px solid #1a1a2e; border-top: 4px solid #ffe600; 
+        }
+        .modal-question-text { font-size: 24px; margin-bottom: 25px; color: #1a1a2e; font-family: 'Courier New', monospace; font-weight: bold;}
+        .modal-input { 
+            width: 80%; padding: 12px; font-size: 20px; border: 2px solid #1a1a2e; border-radius: 4px; 
+            margin-bottom: 25px; text-align: center; font-family: monospace; 
+            background: #f8f9fa; color: #ff8c00; font-weight: bold; transition: 0.3s;
+        }
+        .modal-input:focus { outline: none; border-color: #00ffff; box-shadow: 0 0 8px rgba(0, 255, 255, 0.3); }
+        
+        .modal-btn { background-color: #1a1a2e; color: #00ffff; border: 1px solid #1a1a2e; padding: 12px 25px; font-size: 18px; border-radius: 4px; cursor: pointer; font-weight: bold; text-transform: uppercase; transition: 0.2s; letter-spacing: 1px;}
+        .modal-btn:hover { background-color: #00ffff; color: #1a1a2e; }
+        
+        .modal-close-btn { background-color: transparent; color: #ff4500; border: 1px solid #ff4500; padding: 12px 25px; font-size: 18px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-left: 10px; text-transform: uppercase; transition: 0.2s; letter-spacing: 1px;}
+        .modal-close-btn:hover { background-color: #ff4500; color: #fff; }
+    </style>
+</head>
+<body>
+
+    <h1>Генератор: Скрытая картинка</h1>
+
+    <div class="layout-container">
+        
+        <div class="left-panel">
+            <div class="editor-section">
+                <h3>Шаг 1: Выберите картинку</h3>
+                <div class="input-group">
+                    <label for="imageUrlInput">Ссылка на изображение (из интернета):</label>
+                    <div class="flex-row">
+                        <input type="text" id="imageUrlInput" placeholder="Вставьте прямую ссылку (например: https://.../image.jpg)" oninput="loadImage()">
+                        <button class="btn-primary" onclick="loadImage()">Показать</button>
+                    </div>
+                </div>
+                <div id="imagePreviewArea"><img id="mainImage" src="" alt="Загруженная картинка"></div>
+            </div>
+
+            <div class="editor-section">
+                <h3>Шаг 2: Добавьте вопросы и ответы</h3>
+                
+                <div class="toggle-container">
+                    <label><input type="checkbox" id="latexToggle" onchange="toggleLatexToolbar()"> Включить панель формул (Математика, Физика, Химия)</label>
+                </div>
+
+                <div class="toolbar" id="mathToolbar">
+                    <div class="toolbar-row">
+                        <strong>Базовые:</strong>
+                        <button onclick="insertFormula('\\sqrt{}', 6)">√</button>
+                        <button onclick="insertFormula('\\frac{}{}', 6)">½</button>
+                        <button onclick="insertFormula('^{}', 2)">x²</button>
+                        <button onclick="insertFormula('_{}', 2)">x₂</button>
+                        <button onclick="insertSymbol('\\pm')">±</button>
+                        <button onclick="insertSymbol('\\neq')">≠</button>
+                        <button onclick="insertSymbol('\\approx')">≈</button>
+                    </div>
+                    <div class="toolbar-row">
+                        <strong>Алгебра:</strong>
+                        <button onclick="insertFormula('\\sin()', 5)">sin</button>
+                        <button onclick="insertFormula('\\cos()', 5)">cos</button>
+                        <button onclick="insertFormula('\\tan()', 5)">tan</button>
+                        <button onclick="insertSymbol('\\pi')">π</button>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="questionInput">Текст вопросов (можно вставить столбиком):</label>
+                    <textarea id="questionInput" placeholder="Введите вопросы каждый с новой строки..." oninput="updatePreview()"></textarea>
+                    <div id="latexPreviewContainer" style="display: none;"><div id="preview" class="preview-box">Здесь появится предпросмотр...</div></div>
+                </div>
+
+                <div class="input-group">
+                    <label for="answerInput">Правильные ответы (вставьте столбиком в том же порядке):</label>
+                    <textarea id="answerInput" placeholder="Введите ответы каждый с новой строки..."></textarea>
+                    <small class="hint-text" id="mathHint">💡 Если ученик может ввести ответ по-разному, перечислите варианты <strong>через запятую</strong>.</small>
+                </div>
+
+                <button class="btn-success" onclick="addQuestionsToList()">+ Добавить вопросы в игру</button>
+            </div>
+
+            <div class="editor-section">
+                <h3>Шаг 3: Ваши вопросы для сетки</h3>
+                <div id="emptyListMessage" class="empty-list-msg">Пока не добавлено ни одного вопроса.</div>
+                <ul id="questionsList" class="questions-list"></ul>
+                <div id="gridInfo" style="display: none; padding: 10px; border-radius: 5px;"></div>
+
+                <button class="btn-start-game" onclick="generateAndCopyGame()">🔗 Сгенерировать и скопировать код для Genially</button>
+
+                <div id="exportContainer">
+                    <h3 style="margin-top: 0; color: #32cc11; text-shadow: 0 0 5px rgba(57,255,20,0.3);">✅ КОД СКОПИРОВАН В БУФЕР ОБМЕНА!</h3>
+                    <div class="instructions">
+                        <p><strong>Инструкция по вставке:</strong></p>
+                        <ol style="margin-top: 5px; padding-left: 20px;">
+                            <li>Откройте ваш проект в Genially.</li>
+                            <li>Нажмите <b>Insert</b> (Вставка) на левой панели.</li>
+                            <li>Выберите вкладку <b>Others</b> (Другое).</li>
+                            <li>Вставьте скопированный код в поле <b>Code</b> и нажмите Insert.</li>
+                        </ol>
+                    </div>
+                    <textarea id="iframeCode" readonly onclick="this.select()"></textarea>
+                </div>
+            </div>
+        </div> 
+
+        <div class="right-panel">
+            <div id="gameContainer">
+                <h2 id="gameTitle">Предпросмотр игры</h2>
+                <div id="gameBoard">
+                    <div class="empty-board-msg">Система ожидает загрузки данных...</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="questionModal" class="modal-overlay">
+        <div class="modal-content">
+            <div id="modalQuestionText" class="modal-question-text">Текст вопроса</div>
+            <input type="text" id="modalAnswerInput" class="modal-input" placeholder="Введите код доступа..." autocomplete="off">
+            <br>
+            <button class="modal-btn" onclick="checkAnswer()">Взлом</button>
+            <button class="modal-close-btn" onclick="closeModal()">Отмена</button>
+        </div>
+    </div>
+
+    <script>
+        // --- БАЗОВЫЕ ФУНКЦИИ РЕДАКТОРА ---
+        function loadImage() {
+            const url = document.getElementById('imageUrlInput').value.trim();
+            if (url) {
+                document.getElementById('mainImage').src = url;
+                document.getElementById('imagePreviewArea').style.display = 'block';
+            } else {
+                document.getElementById('imagePreviewArea').style.display = 'none';
+            }
+            refreshLivePreview(); 
+        }
+
+        function toggleLatexToolbar() {
+            const isChecked = document.getElementById('latexToggle').checked;
+            document.getElementById('mathToolbar').style.display = isChecked ? 'flex' : 'none';
+            document.getElementById('latexPreviewContainer').style.display = isChecked ? 'block' : 'none';
+            document.getElementById('mathHint').style.display = isChecked ? 'block' : 'none';
+        }
+
+        function insertFormula(formula, offset) {
+            const ta = document.getElementById('questionInput');
+            const insert = "$" + formula + "$";
+            const start = ta.selectionStart;
+            ta.value = ta.value.substring(0, start) + insert + ta.value.substring(ta.selectionEnd);
+            ta.selectionStart = ta.selectionEnd = start + 1 + offset;
+            ta.focus();
+            updatePreview();
+        }
+
+        function insertSymbol(symbol) {
+            const ta = document.getElementById('questionInput');
+            const insert = "$" + symbol + "$";
+            const start = ta.selectionStart;
+            ta.value = ta.value.substring(0, start) + insert + ta.value.substring(ta.selectionEnd);
+            ta.selectionStart = ta.selectionEnd = start + insert.length;
+            ta.focus();
+            updatePreview();
+        }
+
+        function updatePreview() {
+            const preview = document.getElementById('preview');
+            preview.innerHTML = document.getElementById('questionInput').value.replace(/\n/g, '<br>');
+            if (window.MathJax) MathJax.typesetPromise([preview]);
+        }
+
+        // --- СОСТАВЛЕНИЕ СПИСКА ---
+        function addQuestionsToList() {
+            const qText = document.getElementById('questionInput').value.trim();
+            const aText = document.getElementById('answerInput').value.trim();
+            if (!qText || !aText) { alert("Заполните вопросы и ответы!"); return; }
+
+            const qArr = qText.split('\n').filter(l => l.trim() !== '');
+            const aArr = aText.split('\n').filter(l => l.trim() !== '');
+
+            if (qArr.length !== aArr.length) { alert("Внимание! Количество вопросов не совпадает с количеством ответов."); return; }
+
+            const list = document.getElementById('questionsList');
+            document.getElementById('emptyListMessage').style.display = 'none';
+            list.innerHTML = ''; 
+
+            qArr.forEach((q, i) => {
+                const li = document.createElement('li');
+                li.className = 'question-item';
+                li.innerHTML = `
+                    <div class="question-item-text">
+                        <strong>${i + 1}.</strong> <span class="math-render-target">${q.trim()}</span>
+                        <span class="raw-question" style="display:none;">${q.trim()}</span>
+                        <span class="question-answer-badge">Ответ: <span class="real-answer">${aArr[i].trim()}</span></span>
+                    </div>
+                    <button class="delete-btn" onclick="this.parentElement.remove(); updateGridInfo(); refreshLivePreview();">Удалить</button>
+                `;
+                list.appendChild(li);
+                if (window.MathJax) MathJax.typesetPromise([li.querySelector('.math-render-target')]);
+            });
+            updateGridInfo();
+            refreshLivePreview(); 
+        }
+
+        function updateGridInfo() {
+            const total = document.querySelectorAll('#questionsList .question-item').length;
+            const info = document.getElementById('gridInfo');
+            if (total === 0) { 
+                info.style.display = 'none'; 
+                document.getElementById('emptyListMessage').style.display = 'block';
+                return; 
+            }
+
+            const cols = Math.ceil(Math.sqrt(total));
+            const rows = Math.ceil(total / cols);
+            const bonus = (cols * rows) - total;
+            
+            info.style.display = 'block';
+            info.className = bonus > 0 ? 'hint-warning' : 'hint-success';
+            info.innerHTML = bonus > 0 
+                ? `📊 Сетка: <b>${cols}x${rows}</b>. ⚠️ Пустых клеток: <b>${bonus}</b> (превратятся в 🎁).`
+                : `📊 Сетка: <b>${cols}x${rows}</b>. Идеально!`;
+        }
+
+        // --- МАГИЯ ШИФРОВАНИЯ ---
+        function encodeData(data) {
+            return window.btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+        }
+        function decodeData(encoded) {
+            return JSON.parse(decodeURIComponent(escape(window.atob(encoded))));
+        }
+
+        // --- ГЕНЕРАЦИЯ ССЫЛКИ И АВТОКОПИРОВАНИЕ ДЛЯ GENIALLY ---
+        function generateAndCopyGame() {
+            const imgUrl = document.getElementById('imageUrlInput').value.trim();
+            const items = document.querySelectorAll('#questionsList .question-item');
+            
+            if (!imgUrl) { alert('Загрузите картинку на Шаге 1!'); return; }
+            if (items.length === 0) { alert('Добавьте вопросы на Шаге 2!'); return; }
+
+            let gameConfig = { i: imgUrl, d: [] };
+            items.forEach(li => {
+                gameConfig.d.push({
+                    q: li.querySelector('.raw-question').textContent,
+                    a: li.querySelector('.real-answer').innerText
+                });
+            });
+
+            const encodedStr = encodeData(gameConfig);
+            const baseUrl = window.location.href.split('?')[0].split('#')[0];
+            const finalPlayUrl = baseUrl + '?play=' + encodedStr;
+
+            const iframeHTML = `<iframe src="${finalPlayUrl}" width="100%" height="700" frameborder="0" allowfullscreen></iframe>`;
+            
+            const codeBox = document.getElementById('iframeCode');
+            codeBox.value = iframeHTML;
+            document.getElementById('exportContainer').style.display = 'block';
+
+            // Магия автоматического копирования
+            codeBox.select();
+            document.execCommand('copy');
+            
+            // Если нужно, чтобы страница слегка прокрутилась вниз к инструкции
+            document.getElementById('exportContainer').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // --- ИНИЦИАЛИЗАЦИЯ (ПРОВЕРКА РЕЖИМА) ---
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            if (urlParams.has('play')) {
+                document.querySelector('.left-panel').style.display = 'none';
+                document.querySelector('h1').style.display = 'none';
+                
+                const rightPanel = document.querySelector('.right-panel');
+                rightPanel.style.position = 'static';
+                rightPanel.style.border = 'none';
+                rightPanel.style.boxShadow = 'none';
+                document.getElementById('gameTitle').innerText = 'Открой картинку!';
+                
+                try {
+                    const config = decodeData(urlParams.get('play'));
+                    renderGameBoard(config);
+                } catch (e) {
+                    alert('Ошибка загрузки игры! Ссылка повреждена.');
+                }
+            } else {
+                refreshLivePreview();
+            }
+        });
+
+        // --- ЛОГИКА ЖИВОГО ПРЕДПРОСМОТРА ---
+        function refreshLivePreview() {
+            const imgUrl = document.getElementById('imageUrlInput').value.trim();
+            const items = document.querySelectorAll('#questionsList .question-item');
+            const board = document.getElementById('gameBoard');
+
+            if (items.length === 0) {
+                board.innerHTML = '<div class="empty-board-msg">Система ожидает загрузки данных...</div>';
+                board.style.backgroundImage = imgUrl ? `url('${imgUrl}')` : 'none';
+                board.style.gridTemplateColumns = '1fr';
+                board.style.gridTemplateRows = '1fr';
+                return;
+            }
+
+            let gameConfig = { i: imgUrl || '', d: [] };
+            items.forEach(li => {
+                gameConfig.d.push({
+                    q: li.querySelector('.raw-question').textContent,
+                    a: li.querySelector('.real-answer').innerText
+                });
+            });
+            
+            renderGameBoard(gameConfig);
+        }
+
+        // --- ЛОГИКА САМОЙ ИГРЫ ---
+        let currentActiveTile = null; 
+        let currentValidAnswers = []; 
+
+        function renderGameBoard(config) {
+            const board = document.getElementById('gameBoard');
+            board.style.backgroundImage = `url('${config.i}')`;
+            board.innerHTML = ''; 
+
+            const totalTiles = config.d.length;
+            const cols = Math.ceil(Math.sqrt(totalTiles));
+            const rows = Math.ceil(totalTiles / cols);
+            board.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+            board.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+
+            const bonusSlots = (cols * rows) - totalTiles;
+
+            config.d.forEach((item, index) => {
+                const tile = document.createElement('div');
+                tile.className = 'game-tile';
+                tile.innerText = index + 1; 
+                tile.onclick = () => openModal(tile, item.q, item.a);
+                board.appendChild(tile);
+            });
+
+            for (let i = 0; i < bonusSlots; i++) {
+                const bonusTile = document.createElement('div');
+                bonusTile.className = 'game-tile';
+                bonusTile.innerText = '🎁'; 
+                
+                bonusTile.style.background = 'rgba(255, 140, 0, 0.95)'; 
+                bonusTile.style.borderRightColor = '#39ff14'; 
+                bonusTile.style.borderBottomColor = '#1a1a2e'; 
+                bonusTile.style.textShadow = '0 0 10px rgba(255,255,255,0.8)';
+                
+                bonusTile.onclick = () => bonusTile.classList.add('tile-solved');
+                board.appendChild(bonusTile);
+            }
+        }
+
+        function openModal(tileElement, rawQuestion, answerString) {
+            currentActiveTile = tileElement;
+            currentValidAnswers = answerString.split(',').map(ans => ans.trim().toLowerCase());
+
+            const modalText = document.getElementById('modalQuestionText');
+            modalText.innerHTML = rawQuestion.replace(/\n/g, '<br>'); 
+            
+            document.getElementById('modalAnswerInput').value = '';
+            document.getElementById('questionModal').style.display = 'flex';
+            document.getElementById('modalAnswerInput').focus();
+
+            if (window.MathJax) MathJax.typesetPromise([modalText]);
+        }
+
+        function closeModal() {
+            document.getElementById('questionModal').style.display = 'none';
+        }
+
+        function checkAnswer() {
+            const userInput = document.getElementById('modalAnswerInput').value.trim().toLowerCase();
+            if (userInput === '') return; 
+
+            if (currentValidAnswers.includes(userInput)) {
+                closeModal();
+                currentActiveTile.classList.add('tile-solved');
+            } else {
+                alert('Ошибка доступа! Попробуй еще раз.');
+                document.getElementById('modalAnswerInput').value = '';
+                document.getElementById('modalAnswerInput').focus();
+            }
+        }
+
+        document.getElementById('modalAnswerInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkAnswer();
+        });
+    </script>
+</body>
+</html>
